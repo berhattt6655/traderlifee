@@ -1,3 +1,5 @@
+
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -78,7 +80,6 @@ border:1px solid #2b3147;
 
 </style>
 </head>
-
 <body class="text-white font-sans p-4 sm:p-6 flex justify-center">
 
 <div class="w-full max-w-6xl space-y-6">
@@ -170,7 +171,7 @@ const weekdays=["Sun","Mon","Tue","Wed","Thu","Fri","Sat"]
 const key=(y,m,d)=>`${y}-${m+1}-${d}`
 
 const formatProfit=v=>{
-const k=(Math.abs(v)/10).toFixed()
+const k=(Math.abs(v)/1).toFixed()
 return v>=0?`$${k}`:`-$${k}`
 }
 
@@ -253,12 +254,12 @@ profit+=v.profit
 }
 })
 
-const total=(profit/10).toFixed()
+const total=(profit/1).toFixed()
 
 monthlyProfit.textContent=`$${total}`
-daysTraded.textContent=`${days}`
+daysTraded.textContent=`$${days}`
 
-const avg = days ? (profit/days/10).toFixed(1) : 0
+const avg = days ? (profit/days/1).toFixed() : 1
 if(document.querySelector("#avgProfit"))
  document.querySelector("#avgProfit").textContent=`$${avg}`
 
