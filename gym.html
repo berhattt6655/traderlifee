@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Gym Planner Mobile berhat</title>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;500;700&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box;font-family:'Poppins',sans-serif;}
+body{background:#0a0a0a;color:white;}
+
+/* NAV */
+nav{padding:20px;text-align:center;background:#111;border-bottom:1px solid #222;}
+.logo{color:#00ff99;font-size:28px;font-weight:700;}
+
+/* HERO */
+.hero{
+height:40vh;
+display:flex;
+flex-direction:column;
+justify-content:center;
+align-items:center;
+text-align:center;
+background:linear-gradient(rgba(0,0,0,.7),rgba(0,0,0,.7)),
+url("https://images.unsplash.com/photo-1583454110551-21f2fa2afe61");
+background-size:cover;
+}
+.hero h1{font-size:36px;margin-bottom:10px;}
+.hero span{color:#00ff99;}
+.hero p{font-size:18px;}
+
+/* TIMER */
+.timer{text-align:center;padding:20px;}
+.timer h1{font-size:32px;margin:10px 0;}
+.timer button{
+padding:12px 25px;
+margin:5px;
+border:none;
+background:#00ff99;
+color:black;
+font-weight:700;
+border-radius:10px;
+cursor:pointer;
+font-size:18px;
+}
+
+/* CALENDAR */
+.calendar{padding:30px 5%;text-align:center;}
+.calendar h2{margin-bottom:20px;font-size:22px;}
+.calendar-grid{
+display:grid;
+grid-template-columns:repeat(7,1fr);
+gap:10px;
+margin-bottom:20px;
+}
+.day{
+background:#151515;
+padding:20px;
+border-radius:12px;
+cursor:pointer;
+border:1px solid #222;
+transition:.3s;
+position:relative;
+font-size:14px;
+}
+.day span{display:block;margin-top:8px;color:#00ff99;font-weight:600;font-size:12px;}
+.day:hover{transform:translateY(-5px);box-shadow:0 0 15px rgba(0,255,153,.3);}
+
+/* CHECKLIST */
+.checklist{margin-top:20px;text-align:left;padding:0 5%;}
+.checklist h3{font-size:20px;margin-bottom:15px;}
+.exercise{display:flex;align-items:center;gap:15px;margin:10px 0;font-size:18px;}
+.exercise input{width:25px;height:25px;cursor:pointer;}
+.exercise input:checked + span{text-decoration:line-through;color:#777;}
+
+/* RESET BUTTON */
+#resetWeek{padding:12px 25px;margin:15px auto;display:block;background:red;color:white;font-weight:700;border:none;border-radius:10px;cursor:pointer;font-size:18px;}
+
+/* FOOTER */
+footer{text-align:center;padding:20px;color:#777;border-top:1px solid #222;margin-top:40px;}
+
+/* RESPONSIVE */
+@media(max-width:768px){
+  .calendar-grid{grid-template-columns:repeat(4,1fr);}
+  .day{padding:18px;font-size:16px;}
+  .day span{font-size:10px;}
+}
+@media(max-width:480px){
+  .calendar-grid{grid-template-columns:repeat(2,1fr);}
+  .day{padding:20px;font-size:18px;}
+  .day span{font-size:12px;}
+  .timer button{padding:15px 30px;font-size:20px;}
+  .exercise{font-size:20px;}
+}
+</style>
+</head>
+<body>
+
+<nav><div class="logo">GYM PLAN for Berhat</div></nav>
+
+<section class="hero">
+<h1>Train <span>Harder</span></h1>
+<p>Click a day to view & check exercises</p>
+</section>
+
+<section class="timer">
+<h2>Workout Timer</h2>
+<h1 id="timer">00:00</h1>
+<button onclick="startTimer()">Start</button>
+<button onclick="pauseTimer()">Pause</button>
+<button onclick="resetTimer()">Reset</button>
+</section>
+
+<section class="calendar">
+<h2>Weekly Calendar</h2>
+<div class="calendar-grid">
+<div class="day" onclick="showChecklist('monday')">Mon<span>Back+Biceps</span></div>
+<div class="day" onclick="showChecklist('tuesday')">Tue<span>Chest+Triceps</span></div>
+<div class="day" onclick="showChecklist('wednesday')">Wed<span>Arms+Abs</span></div>
+<div class="day" onclick="showChecklist('thursday')">Thu<span>Shoulders</span></div>
+<div class="day" onclick="showChecklist('friday')">Fri<span>legs</span></div>
+<div class="day" onclick="showChecklist('saturday')">Sat<span>Biceps+Triceps</span></div>
+<div class="day" onclick="showChecklist('sunday')">Sun<span>Rest</span></div>
+</div>
+
+<div id="checklistContainer" class="checklist"></div>
+<button id="resetWeek" onclick="resetWeek()">Reset Week</button>
+</section>
+
+<footer>Stay consistent 💪</footer>
+
+<script>
+// WORKOUT DATA
+const workouts = {
+monday:["Bench Press","Incline Dumbbell Press","Cable Fly","Tricep Pushdown"],
+tuesday:["Pull Ups","Barbell Row","Lat Pulldown","Hammer Curl"],
+wednesday:["Squats","Leg Press","Lunges","Calf Raises"],
+thursday:["Overhead Press","Lateral Raise","Front Raise","Face Pull"],
+friday:["Barbell Curl","Skull Crushers","Cable Curl","Hanging Leg Raise"],
+saturday:["Running","Cycling","Jump Rope","HIIT Training"],
+sunday:["Stretching","Walking","Foam Rolling","Recovery"]
+};
+
+// SHOW CHECKLIST
+function showChecklist(day){
+  const container = document.getElementById("checklistContainer");
+  container.innerHTML = `<h3 style="color:#00ff99;text-transform:capitalize;">${day}</h3>`;
+
+  workouts[day].forEach((exercise,i)=>{
+    const div = document.createElement("div");
+    div.className = "exercise";
+
+    const key = `${day}-${i}`;
+    const checked = localStorage.getItem(key) === "true";
+
+    div.innerHTML = `<input type="checkbox" id="${key}" ${checked ? "checked" : ""}><span>${exercise}</span>`;
+    container.appendChild(div);
+
+    const checkbox = div.querySelector("input");
+    checkbox.addEventListener("change", ()=>{
+      localStorage.setItem(key, checkbox.checked);
+      updateDayStatus(day);
+    });
+  });
+
+  updateDayStatus(day);
+}
+
+// UPDATE DAY COLOR BASED ON COMPLETION
+function updateDayStatus(day){
+  const allChecked = workouts[day].every((_,i)=>localStorage.getItem(`${day}-${i}`)==="true");
+  const calendarDays = document.querySelectorAll(".calendar .day");
+  calendarDays.forEach(d=>{
+    if(d.innerText.toLowerCase().startsWith(day.substring(0,3))){
+      d.style.background = allChecked ? "#00ff99" : "#151515";
+    }
+  });
+}
+
+// RESET WEEK
+function resetWeek(){
+  Object.keys(workouts).forEach(day=>{
+    workouts[day].forEach((_,i)=>{
+      localStorage.removeItem(`${day}-${i}`);
+    });
+    updateDayStatus(day);
+  });
+  document.getElementById("checklistContainer").innerHTML="";
+}
+
+/* TIMER */
+let seconds=0,timerInterval;
+function startTimer(){timerInterval=setInterval(()=>{
+seconds++;
+let minutes=Math.floor(seconds/60),secs=seconds%60;
+document.getElementById("timer").innerText=
+String(minutes).padStart(2,'0')+":"+String(secs).padStart(2,'0');
+},1000);}
+function pauseTimer(){clearInterval(timerInterval);}
+function resetTimer(){clearInterval(timerInterval);seconds=0;document.getElementById("timer").innerText="00:00";}
+
+// INITIALIZE CALENDAR STATUS
+Object.keys(workouts).forEach(day=>updateDayStatus(day));
+</script>
+
+</body>
+</html>
+

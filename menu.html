@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Menu | Trader Journal</title>
+
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://unpkg.com/lucide@latest"></script>
+
+<style>
+body{
+ background: radial-gradient(circle at top,#0f172a,#020617);
+ min-height:100vh;
+}
+
+.card{
+ background: rgba(255,255,255,0.04);
+ backdrop-filter: blur(14px);
+ border:1px solid rgba(255,255,255,0.08);
+ transition:all .25s ease;
+}
+
+.card:hover{
+ transform: translateY(-6px);
+ background: rgba(255,255,255,0.08);
+}
+
+</style>
+</head>
+
+<body class="text-white font-sans">
+
+<!-- HEADER -->
+<header class="border-b border-white/10">
+<div class="max-w-6xl mx-auto px-6 py-4 flex items-center justify-between">
+
+<div class="flex items-center gap-2 font-semibold text-lg">
+<i data-lucide="candlestick-chart"></i>
+Trader Journal
+</div>
+
+<a href="dashboard.html" class="text-sm text-gray-400 hover:text-white">Back Home</a>
+
+</div>
+</header>
+
+<!-- PAGE TITLE -->
+<section class="px-6 pt-16 pb-10 text-center">
+<h1 class="text-3xl md:text-4xl font-bold">Main Menu</h1>
+<p class="text-gray-400 mt-2">Choose where you want to go</p>
+</section>
+
+<!-- MAIN MENU GRID -->
+<section class="px-6 pb-24">
+
+<div class="max-w-6xl mx-auto">
+
+<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+
+<a href="twotomellion.html" class="card p-8 rounded-2xl space-y-4 text-center">
+<div class="flex justify-center">
+<i data-lucide="layout-dashboard" class="w-10 h-10"></i>
+</div>
+<h3 class="text-xl font-semibold" href="twotomellion.html">20$ to one million</h3>
+<p class="text-sm text-gray-400">View trading performance and key statistics.</p>
+</a>
+
+<a href="index.html" class="card p-8 rounded-2xl space-y-4 text-center">
+<div class="flex justify-center">
+<i data-lucide="calendar" class="w-10 h-10"></i>
+</div>
+<h3 class="text-xl font-semibold">Trading Calendar</h3>
+<p class="text-sm text-gray-400">Track your daily trading results visually.</p>
+</a>
+
+<a href="funded.html" class="card p-8 rounded-2xl space-y-4 text-center">
+<div class="flex justify-center">
+<i data-lucide="bar-chart-3" class="w-10 h-10"></i>
+</div>
+<h3 class="text-xl font-semibold">Funded plan</h3>
+<p class="text-sm text-gray-400">Analyze your strategies and performance.</p>
+</a>
+
+<a href="daily.html" class="card p-8 rounded-2xl space-y-4 text-center">
+<div class="flex justify-center">
+<i data-lucide="book-open" class="w-10 h-10"></i>
+</div>
+<h3 class="text-xl font-semibold">Daily Plan</h3>
+<p class="text-sm text-gray-400">Write notes and review your trades.</p>
+</a>
+
+<a href="gym.html" class="card p-8 rounded-2xl space-y-4 text-center">
+<div class="flex justify-center">
+<i data-lucide="target" class="w-10 h-10"></i>
+</div>
+<h3 class="text-xl font-semibold">Gym</h3>
+<p class="text-sm text-gray-400">Set and track your trading goals.</p>
+</a>
+
+
+
+<!-- FOOTER -->
+<footer class="border-t border-white/10 py-6 text-center text-sm text-gray-500">
+© 2026 Trader Journal
+</footer>
+
+<script>
+lucide.createIcons()
+</script>
+
+</body>
+</html>

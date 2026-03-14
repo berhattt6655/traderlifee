@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Trading Journal</title>
+<script src="https://cdn.tailwindcss.com"></script>
+
+<style>
+:root{
+--bg:#05060a;
+--panel:#0f1117;
+--card:#171923;
+--border:#242735;
+}
+
+body{
+background:radial-gradient(circle at top,#111827,#05060a);
+}
+
+.panel{
+background:rgba(255,255,255,.03);
+backdrop-filter:blur(14px);
+border:1px solid var(--border);
+}
+
+.day{
+background:var(--card);
+border:1px solid var(--border);
+transition:all .25s ease;
+cursor:pointer;
+min-height:95px;
+}
+
+@media (min-width:640px){
+.day{min-height:115px}
+}
+
+@media (min-width:900px){
+.day{min-height:135px}
+}
+
+.day:hover{
+transform:translateY(-4px);
+box-shadow:0 14px 35px rgba(0,0,0,.6);
+}
+
+.profit{
+background:linear-gradient(180deg,#22c55e,#064e3b);
+}
+
+.loss{
+background:linear-gradient(180deg,#ef4444,#7f1d1d);
+}
+
+.modal{
+position:fixed;
+inset:0;
+background:rgba(0,0,0,.65);
+display:flex;
+align-items:center;
+justify-content:center;
+padding:20px;
+}
+
+input{
+background:#1b1e29;
+border:1px solid #2a2f42;
+}
+
+button{transition:.15s ease}
+button:hover{transform:translateY(-1px)}
+
+.statCard{
+background:linear-gradient(135deg,#1e293b,#0f172a);
+border:1px solid #2b3147;
+}
+
+</style>
+</head>
+
+<body class="text-white font-sans p-4 sm:p-6 flex justify-center">
+
+<div class="w-full max-w-6xl space-y-6">
+
+<!-- HEADER -->
+<header class="panel rounded-2xl p-4 sm:p-5 space-y-4">
+
+<div class="flex items-center justify-between">
+
+<div class="flex items-center gap-3">
+<button id="prevMonth" class="px-3 py-1.5 bg-[#1f2332] rounded-lg">◀</button>
+
+<h2 id="monthLabel" class="text-lg sm:text-xl font-semibold"></h2>
+
+<button id="nextMonth" class="px-3 py-1.5 bg-[#1f2332] rounded-lg">▶</button>
+</div>
+
+</div>
+
+<!-- STATS -->
+<div class="grid grid-cols-2 sm:grid-cols-3 gap-3">
+
+<div class="statCard rounded-xl p-3 text-center">
+<p class="text-xs text-gray-400">Monthly Profit</p>
+<p id="monthlyProfit" class="text-lg font-bold"></p>
+</div>
+
+<div class="statCard rounded-xl p-3 text-center">
+<p class="text-xs text-gray-400">Trading Days</p>
+<p id="daysTraded" class="text-lg font-bold"></p>
+</div>
+
+<div class="statCard rounded-xl p-3 text-center hidden sm:block">
+<p class="text-xs text-gray-400">Avg Profit</p>
+<p id="avgProfit" class="text-lg font-bold"></p>
+</div>
+
+</div>
+
+</header>
+
+<!-- WEEKDAYS -->
+<div id="weekdays" class="grid grid-cols-7 gap-1 sm:gap-3 text-[11px] sm:text-sm text-center text-gray-400"></div>
+
+<!-- CALENDAR -->
+<div id="calendar" class="grid grid-cols-7 gap-1 sm:gap-3"></div>
+
+</div>
+
+<!-- MODAL -->
+<div id="modal" class="hidden modal">
+
+<div class="panel rounded-2xl p-6 w-full max-w-sm">
+
+<h3 class="text-lg mb-4 font-semibold">Add Trade</h3>
+
+<input id="profitInput" type="number" placeholder="Profit / Loss" class="w-full mb-3 p-2 rounded" />
+<input id="tradesInput" type="number" placeholder="Trades" class="w-full mb-3 p-2 rounded" />
+<input id="winInput" type="number" placeholder="Win %" class="w-full mb-4 p-2 rounded" />
+
+<div class="flex gap-2">
+<button id="saveBtn" class="flex-1 bg-emerald-600 py-2 rounded-lg">Save</button>
+<button id="closeBtn" class="flex-1 bg-gray-600 py-2 rounded-lg">Cancel</button>
+</div>
+
+</div>
+
+</div>
+
+<script type="module">
+
+const loadTrades=()=>JSON.parse(localStorage.getItem("trades")||"{}")
+const saveTrades=data=>localStorage.setItem("trades",JSON.stringify(data))
+
+let trades=loadTrades()
+
+let now=new Date()
+let month=now.getMonth()
+let year=now.getFullYear()
+
+const calendar=document.querySelector("#calendar")
+const weekdaysRow=document.querySelector("#weekdays")
+const modal=document.querySelector("#modal")
+
+let selectedDay=null
+
+const weekdays=["Sun","Mon","Tue","Wed","Thu","Fri","Sat"]
+
+const key=(y,m,d)=>`${y}-${m+1}-${d}`
+
+const formatProfit=v=>{
+const k=(Math.abs(v)/10).toFixed()
+return v>=0?`$${k}`:`-$${k}`
+}
+
+const styleClass=data=>{
+if(!data) return ""
+if(data.profit>0) return "profit"
+if(data.profit<0) return "loss"
+return ""
+}
+
+/* WEEKDAYS */
+
+const renderWeekdays=()=>{
+weekdaysRow.innerHTML=weekdays
+.map(d=>`<div class="panel py-2 rounded-lg">${d}</div>`)
+.join("")
+}
+
+/* CALENDAR */
+
+const renderCalendar=()=>{
+
+const firstDay=new Date(year,month,1).getDay()
+const daysInMonth=new Date(year,month+1,0).getDate()
+
+let cells=[]
+
+for(let i=0;i<firstDay;i++) cells.push(`<div></div>`)
+
+for(let d=1;d<=daysInMonth;d++){
+
+const data=trades[key(year,month,d)]
+const style=styleClass(data)
+
+cells.push(`
+
+<div class="day rounded-xl p-2 sm:p-3 flex flex-col justify-between ${style}" data-day="${d}">
+
+<div class="text-gray-400 text-[11px] sm:text-sm">${d}</div>
+
+${data?`
+<div class="text-center leading-tight">
+<div class="font-bold text-xs sm:text-sm">${formatProfit(data.profit)}</div>
+<div class="text-[10px] sm:text-xs text-gray-200">${data.trades} trades</div>
+<div class="text-[10px] sm:text-xs text-gray-300">${data.win}%</div>
+</div>
+`:""}
+
+</div>
+
+`)
+}
+
+calendar.innerHTML=cells.join("")
+
+renderStats()
+renderLabel()
+
+}
+
+/* LABEL */
+
+const renderLabel=()=>{
+const text=new Date(year,month).toLocaleString("default",{month:"long",year:"numeric"})
+document.querySelector("#monthLabel").textContent=text
+}
+
+/* STATS */
+
+const renderStats=()=>{
+
+let profit=0
+let days=0
+
+Object.entries(trades).forEach(([k,v])=>{
+const [y,m]=k.split("-")
+if(Number(y)===year && Number(m)-1===month){
+profit+=v.profit
+ days++
+}
+})
+
+const total=(profit/10).toFixed()
+
+monthlyProfit.textContent=`$${total}`
+daysTraded.textContent=`${days}`
+
+const avg = days ? (profit/days/10).toFixed(1) : 0
+if(document.querySelector("#avgProfit"))
+ document.querySelector("#avgProfit").textContent=`$${avg}`
+
+}
+
+/* EVENTS */
+
+calendar.addEventListener("click",e=>{
+
+const el=e.target.closest(".day")
+if(!el) return
+
+selectedDay=el.dataset.day
+modal.classList.remove("hidden")
+
+})
+
+closeBtn.onclick=()=>modal.classList.add("hidden")
+
+saveBtn.onclick=()=>{
+
+const profit=Number(profitInput.value)
+const tradesCount=Number(tradesInput.value)
+const win=Number(winInput.value)
+
+trades[key(year,month,selectedDay)]={profit,trades:tradesCount,win}
+
+saveTrades(trades)
+
+modal.classList.add("hidden")
+
+renderCalendar()
+
+}
+
+prevMonth.onclick=()=>{
+month--
+if(month<0){month=11;year--}
+renderCalendar()
+}
+
+nextMonth.onclick=()=>{
+month++
+if(month>11){month=0;year++}
+renderCalendar()
+}
+
+/* SWIPE */
+
+let startX=0
+
+calendar.addEventListener("touchstart",e=>{
+startX=e.touches[0].clientX
+})
+
+calendar.addEventListener("touchend",e=>{
+let endX=e.changedTouches[0].clientX
+
+if(startX-endX>70) nextMonth.onclick()
+if(endX-startX>70) prevMonth.onclick()
+
+})
+
+/* INIT */
+
+const init=()=>{
+renderWeekdays()
+renderCalendar()
+}
+
+init()
+
+</script>
+
+</body>
+</html>

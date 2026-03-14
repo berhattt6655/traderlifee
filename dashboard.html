@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Trader Journal</title>
+
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://unpkg.com/lucide@latest"></script>
+
+<style>
+body{
+ background: radial-gradient(circle at top,#0f172a,#020617);
+ min-height:100vh;
+}
+
+.glass{
+ background: rgba(255,255,255,0.04);
+ backdrop-filter: blur(14px);
+ border:1px solid rgba(255,255,255,0.08);
+}
+
+.heroGlow{
+ background: radial-gradient(circle,#3b82f620,transparent 60%);
+}
+
+</style>
+</head>
+
+<body class="text-white font-sans">
+
+<!-- NAVBAR -->
+<header class="glass fixed top-0 left-0 right-0 z-50">
+
+<div class="max-w-6xl mx-auto flex items-center justify-between px-6 py-4">
+
+<div class="flex items-center gap-2 font-semibold">
+<i data-lucide="candlestick-chart"></i>
+Trader Journal
+</div>
+
+
+<a class="bg-indigo-600 px-4 py-2 rounded-lg text-sm hover:bg-indigo-500" href="menu.html">
+Go to menu 
+</a>
+
+</div>
+
+</header>
+
+<!-- HERO -->
+<section class="pt-32 pb-24 px-6">
+
+<div class="max-w-5xl mx-auto text-center space-y-6">
+
+<div class="heroGlow h-40 w-40 rounded-full mx-auto blur-3xl"></div>
+
+<h1 class="text-4xl md:text-6xl font-bold leading-tight">
+Track Your Trading
+<span class="text-indigo-400">Like a Pro</span>
+</h1>
+
+<p class="text-gray-400 max-w-xl mx-auto">
+A modern trading journal to track performance, analyze trades, and improve your strategy.
+</p>
+
+<div class="flex justify-center gap-4 pt-4">
+
+<a class="bg-indigo-600 px-6 py-3 rounded-xl hover:bg-indigo-500" href="menu.html">
+Go to Menu
+</a>
+
+<a class="glass px-6 py-3 rounded-xl hover:bg-white/10" href="dashboard.html">
+View Dashboard
+</a>
+
+</div>
+
+</div>
+
+</section>
+
+<!-- FEATURES -->
+<section class="px-6 pb-24">
+
+<div class="max-w-6xl mx-auto grid md:grid-cols-3 gap-6">
+
+<div class="glass p-6 rounded-xl space-y-3">
+<i data-lucide="bar-chart-3"></i>
+<h3 class="font-semibold">Performance Analytics</h3>
+<p class="text-sm text-gray-400">Understand your trading statistics and improve your strategy.</p>
+</div>
+
+<div class="glass p-6 rounded-xl space-y-3">
+<i data-lucide="calendar"></i>
+<h3 class="font-semibold">Trade Calendar</h3>
+<p class="text-sm text-gray-400">Visualize your daily trading performance in one place.</p>
+</div>
+
+<div class="glass p-6 rounded-xl space-y-3">
+<i data-lucide="trending-up"></i>
+<h3 class="font-semibold">Growth Tracking</h3>
+<p class="text-sm text-gray-400">Monitor your trading growth with powerful charts.</p>
+</div>
+
+</div>
+
+</section>
+
+<!-- FOOTER -->
+<footer class="border-t border-white/10 py-6 text-center text-sm text-gray-500">
+© 2026 Trader Journal
+</footer>
+
+<script>
+lucide.createIcons()
+</script>
+
+</body>
+</html>
+

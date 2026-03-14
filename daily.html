@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Weekly & Monthly Planner</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+
+<style>
+*{box-sizing:border-box}
+body{
+font-family:'Inter',sans-serif;
+margin:0;
+min-height:100vh;
+background:linear-gradient(135deg,#4f46e5,#06b6d4);
+color:white;
+padding:30px;
+}
+
+.app{
+max-width:1200px;
+margin:auto;
+background:rgba(255,255,255,0.15);
+backdrop-filter:blur(16px);
+padding:30px;
+border-radius:22px;
+box-shadow:0 25px 60px rgba(0,0,0,0.25);
+}
+
+header{
+display:flex;
+justify-content:space-between;
+align-items:center;
+flex-wrap:wrap;
+gap:10px;
+margin-bottom:20px;
+}
+
+h1{margin:0}
+
+.tabs{
+display:flex;
+gap:10px;
+margin-bottom:20px;
+}
+
+.tab{
+background:rgba(255,255,255,0.25);
+border:none;
+padding:8px 14px;
+border-radius:10px;
+color:white;
+cursor:pointer;
+}
+
+.active{
+background:#0ea5e9;
+}
+
+.week{
+display:grid;
+grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
+gap:16px;
+}
+
+.day{
+background:rgba(255,255,255,0.2);
+border-radius:16px;
+padding:14px;
+display:flex;
+flex-direction:column;
+min-height:260px;
+}
+
+.day h3{margin:0 0 10px 0;font-size:16px}
+
+.task-input{display:flex;gap:6px;margin-bottom:10px}
+
+.task-input input{
+flex:1;
+padding:8px;
+border-radius:8px;
+border:none;
+font-size:13px;
+}
+
+.task-input button{
+padding:8px 10px;
+border:none;
+border-radius:8px;
+background:#0ea5e9;
+color:white;
+font-size:12px;
+cursor:pointer;
+}
+
+ul{list-style:none;padding:0;margin:0;display:flex;flex-direction:column;gap:6px}
+
+li{
+display:flex;
+justify-content:space-between;
+align-items:center;
+background:rgba(255,255,255,0.25);
+padding:6px 8px;
+border-radius:8px;
+font-size:13px;
+}
+
+.task-left{display:flex;align-items:center;gap:6px}
+
+.done{text-decoration:line-through;opacity:0.6}
+
+.delete{
+background:#ef4444;
+border:none;
+border-radius:6px;
+color:white;
+font-size:11px;
+padding:4px 6px;
+cursor:pointer;
+}
+
+.month{
+display:grid;
+grid-template-columns:repeat(7,1fr);
+gap:10px;
+}
+
+.month-day{
+background:rgba(255,255,255,0.2);
+border-radius:10px;
+padding:8px;
+min-height:90px;
+font-size:12px;
+}
+
+.month-day strong{display:block;margin-bottom:4px}
+
+</style>
+</head>
+<body>
+
+<div class="app">
+
+<header>
+<h1>Planner</h1>
+</header>
+
+<div class="tabs">
+<button class="tab active" onclick="showTab('week')">Weekly</button>
+<button class="tab" onclick="showTab('month')">Monthly</button>
+</div>
+
+<div id="weeklyView" class="week"></div>
+<div id="monthlyView" class="month" style="display:none"></div>
+
+</div>
+
+<script>
+const days=["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday","Sunday"];
+
+let tasks=JSON.parse(localStorage.getItem("plannerTasks"))||{};
+
+if(!tasks.week) tasks.week={};
+if(!tasks.month) tasks.month={};
+
+days.forEach(d=>{if(!tasks.week[d]) tasks.week[d]=[]});
+
+function save(){
+localStorage.setItem("plannerTasks",JSON.stringify(tasks));
+}
+
+function showTab(tab){
+document.getElementById("weeklyView").style.display=tab==='week'?'grid':'none';
+document.getElementById("monthlyView").style.display=tab==='month'?'grid':'none';
+
+Array.from(document.querySelectorAll('.tab')).forEach(b=>b.classList.remove('active'));
+if(tab==='week') document.querySelectorAll('.tab')[0].classList.add('active');
+else document.querySelectorAll('.tab')[1].classList.add('active');
+}
+
+function renderWeek(){
+const container=document.getElementById("weeklyView");
+container.innerHTML="";
+
+days.forEach(day=>{
+
+const box=document.createElement("div");
+box.className="day";
+
+const title=document.createElement("h3");
+title.innerText=day;
+
+const inputRow=document.createElement("div");
+inputRow.className="task-input";
+
+const input=document.createElement("input");
+input.placeholder="Add task";
+
+const btn=document.createElement("button");
+btn.innerText="Add";
+
+btn.onclick=()=>{
+const text=input.value.trim();
+if(!text) return;
+
+tasks.week[day].push({text,done:false});
+input.value="";
+save();
+render();
+};
+
+inputRow.appendChild(input);
+inputRow.appendChild(btn);
+
+const list=document.createElement("ul");
+
+tasks.week[day].forEach((task,i)=>{
+
+const li=document.createElement("li");
+
+const left=document.createElement("div");
+left.className="task-left";
+
+const check=document.createElement("input");
+check.type="checkbox";
+check.checked=task.done;
+check.onchange=()=>{
+ tasks.week[day][i].done=!tasks.week[day][i].done;
+ save();
+ render();
+};
+
+const span=document.createElement("span");
+span.innerText=task.text;
+if(task.done) span.classList.add("done");
+
+left.appendChild(check);
+left.appendChild(span);
+
+const del=document.createElement("button");
+del.className="delete";
+del.innerText="X";
+
+del.onclick=()=>{
+ tasks.week[day].splice(i,1);
+ save();
+ render();
+};
+
+li.appendChild(left);
+li.appendChild(del);
+list.appendChild(li);
+
+});
+
+box.appendChild(title);
+box.appendChild(inputRow);
+box.appendChild(list);
+container.appendChild(box);
+
+});
+}
+
+function renderMonth(){
+const container=document.getElementById("monthlyView");
+container.innerHTML="";
+
+for(let i=1;i<=30;i++){
+
+const box=document.createElement("div");
+box.className="month-day";
+
+const title=document.createElement("strong");
+title.innerText="Day "+i;
+
+const input=document.createElement("input");
+input.placeholder="Note";
+input.style.width="100%";
+input.style.border="none";
+input.style.borderRadius="6px";
+input.style.padding="3px";
+
+input.value=tasks.month[i]||"";
+
+input.onchange=()=>{
+ tasks.month[i]=input.value;
+ save();
+};
+
+box.appendChild(title);
+box.appendChild(input);
+container.appendChild(box);
+
+}
+}
+
+function render(){
+renderWeek();
+renderMonth();
+}
+
+render();
+</script>
+
+</body>
+</html>
